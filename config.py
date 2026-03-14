@@ -1,4 +1,4 @@
-TOKEN = "7101411525:AAFOOqKa6I8s9QSXSZucKYl7aeSH5sUrrQU"
+TOKEN = "7139072705:AAFmOzwzRlSRAIJvcUdem8Tjw0wseGPFJkg"
 master_id = 900865796
 
 username_app = 'firestormwebapp'
