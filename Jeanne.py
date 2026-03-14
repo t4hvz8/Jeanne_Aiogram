@@ -342,7 +342,7 @@ async def start(message: types.Message, state: FSMContext):
                             chan_id = int((cur.execute('SELECT chan_id FROM giveaways_data WHERE giveaway_status = ?', [act]).fetchone())[0])
                             msg_id = int((cur.execute('SELECT msg_id FROM giveaways_data WHERE giveaway_status = ?', [act]).fetchone())[0])
                         board = InlineKeyboardBuilder()
-                        board.add(types.InlineKeyboardButton(text=f"Участвовать ({tributes+1})", url='https://t.me/Firestorm_contest_bot'))
+                        board.add(types.InlineKeyboardButton(text=f"Участвовать ({tributes+1})", url='https://t.me/namnambot_bot'))
                         try:
                             await bot.edit_message_reply_markup(chat_id=chan_id, message_id=msg_id, reply_markup=board.as_markup())
                         except Exception as e:
@@ -958,42 +958,6 @@ async def process_callback(callback_query: types.CallbackQuery, state: FSMContex
                     con.commit()
             except Exception as e:
                 await callback_query.message.answer(f"<i>Не удалось удалить старую базу винеров\nОшибка {e}</i>", parse_mode="HTML")
-            
-
-# Проверяем срок действия
-            response = requests.get(
-                'https://www.pythonanywhere.com/api/v0/user/{username}/webapps/'.format(
-                username=username_app
-                ),
-                headers={'Authorization': 'Token {token}'.format(token=token_app)}
-            )
-            if response.status_code == 200:
-                soup = BeautifulSoup(response.text, 'lxml').text
-                data = response.json()
-                expiry_date = data[0]['expiry']
-                time_web = datetime.strptime(f"{expiry_date}", "%Y-%m-%d").date()
-                time_now = (datetime.today()).date()
-                exp = (time_web - time_now).days
-
-                with sqlite3.connect('data/db/role/admin.db') as con:
-                    cur = con.cursor()
-                    cur.execute('UPDATE login SET time_app = ?', [time_web])
-
-    # для проверки таска            
-    #            response = requests.get(
-    #                'https://www.pythonanywhere.com/api/v0/user/{username}/schedule/'.format(
-    #                username=username_app
-    #                ),
-    #                headers={'Authorization': 'Token {token}'.format(token=token_app)}
-    #            )
-    #            soup = BeautifulSoup(response.text, 'lxml').text
-    #            data = response.json()
-    #            expiry_date = data[0]['expiry']
-    #            time_web = datetime.strptime(f"{expiry_date}", "%Y-%m-%d").date()
-    #            time_now = datetime.today()
-    #            task_expiry = (time_web - time_now).days
-            else:
-                exp = 'не удалось обновить'
 
             con = sqlite3.connect('data/db/giveaway/chan_data.db')
             cur = con.cursor()
@@ -1198,19 +1162,10 @@ async def process_callback(callback_query: types.CallbackQuery, state: FSMContex
         with open('data/variables/post/end_post.txt', "r", encoding="utf-8") as f:
             caption = f.read()
         board = InlineKeyboardBuilder()
-        board.add(types.InlineKeyboardButton(text="🎁Узнать результат🎁", url='https://t.me/Firestorm_contest_bot'))
+        board.add(types.InlineKeyboardButton(text="🎁Узнать результат🎁", url='https://t.me/namnambot_bot'))
         await bot.send_photo(chat_id=chan_id, photo=scr, caption=caption, parse_mode="HTML", reply_markup=board.as_markup())
         
-        # Льем базу на WebApp
-        api_username = 'firestormwebapp'
-        api_token = '2189e082315434ef3a071884a88db47ce912e954'
-        remote_path = '/home/firestormwebapp/webapp/winners.db'
-        file_path = 'data/db/giveaway/winners.db'
-        url = f"https://www.pythonanywhere.com/api/v0/user/{api_username}/files/path{remote_path}"
-        headers = {"Authorization": f"Token {api_token}"}
-        with open(file_path, "rb") as file:
-            file_content = file.read()
-        response = requests.post(url, headers=headers, files={"content": file_content})
+       
 
 
     elif data == "channal_plus":
@@ -1262,7 +1217,7 @@ async def process_callback(callback_query: types.CallbackQuery, state: FSMContex
         with open('data/variables/post/start_post.txt', "r", encoding="utf-8") as f:
             text_post = f.read()
         board = InlineKeyboardBuilder()
-        board.add(types.InlineKeyboardButton(text="Участвовать", url='https://t.me/Firestorm_contest_bot'))
+        board.add(types.InlineKeyboardButton(text="Участвовать", url='https://t.me/namnambot_bot'))
         msg = await bot.send_photo(chat_id=chan_id, photo=jpg_post, caption=text_post, parse_mode="HTML", reply_markup=board.as_markup())
         msg_id = msg.message_id
         with sqlite3.connect('data/db/giveaway/giveaway.db') as con:
