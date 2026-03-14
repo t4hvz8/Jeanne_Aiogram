@@ -13,7 +13,7 @@ import requests
 
 #import update
 
-from bs4 import BeautifulSoup
+#from bs4 import BeautifulSoup
 
 from array import *
 
