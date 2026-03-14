@@ -48,13 +48,13 @@ from config import *
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
-admin_db = 'home/userland/Jeanne_Aiogram/data/db/role/admin.db'
+admin_db = '/home/userland/Jeanne_Aiogram/data/db/role/admin.db'
 
 
-HISTORY_DIR = "home/userland/Jeanne_Aiogram/data/history"
+HISTORY_DIR = "/home/userland/Jeanne_Aiogram/data/history"
 logging.basicConfig(level=logging.INFO)
 
-logging.basicConfig(level=logging.INFO, filename='home/userland/Jeanne_Aiogram/data/variables/log.txt', format='%(asctime)s - %(message)s')
+logging.basicConfig(level=logging.INFO, filename='/home/userland/Jeanne_Aiogram/data/variables/log.txt', format='%(asctime)s - %(message)s')
 
 class ADMINS(StatesGroup):
     idtg = State()
@@ -92,7 +92,7 @@ class manual_send(StatesGroup):
 
 
 # Создаем БД админов
-con = sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/role/admin.db')
+con = sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/role/admin.db')
 cur = con.cursor()
 cur.execute('''
     CREATE TABLE IF NOT EXISTS admins(
@@ -115,7 +115,7 @@ cur.close()
 con.close()
 
 # Создаем БД записок
-con = sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/notepad/notepad.db')
+con = sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/notepad/notepad.db')
 cur = con.cursor()
 cur.execute('''
     CREATE TABLE IF NOT EXISTS note(
@@ -130,7 +130,7 @@ cur.close()
 con.close()
 
 # Создаем БД каналов
-con = sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/giveaway/chan_data.db')
+con = sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/giveaway/chan_data.db')
 cur = con.cursor()
 cur.execute('''
     CREATE TABLE IF NOT EXISTS channals(
@@ -147,7 +147,7 @@ con.close()
 @dp.message(Command("start"))
 async def start(message: types.Message, state: FSMContext):
     try:
-        with sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
+        with sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
             cur = con.cursor()
             tributes = (cur.execute('SELECT COUNT (*) from tributes').fetchone())[0]
 
@@ -175,7 +175,7 @@ async def start(message: types.Message, state: FSMContext):
     if is_user_admin(user_id):
         role = role_in_db(user_id)
         board = InlineKeyboardBuilder()
-        con = sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/role/admin.db')
+        con = sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/role/admin.db')
         cur = con.cursor()
         # Обновляем имя и ник админа
         cur.execute(f'UPDATE admins SET name = ? wHERE idtg = {user_id} ', [name])
@@ -191,7 +191,7 @@ async def start(message: types.Message, state: FSMContext):
         board.row(types.InlineKeyboardButton(text="❗️HELP❗️SOS❗️", callback_data="start_sos"))
         board.adjust(1)
         try:
-            with sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
+            with sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
                 cur = con.cursor()
                 number = int((cur.execute('SELECT COUNT (*) from giveaways_data').fetchone())[0])
                 giveaway_link = (cur.execute('SELECT chan_link FROM giveaways_data WHERE giveaway_status = ?', ['active']).fetchone())[0]
@@ -203,7 +203,7 @@ async def start(message: types.Message, state: FSMContext):
             date_obj = datetime.strptime(giveaway_end, "%d_%m_%Y")
             delta = (date_obj - current_date).days
             delta1 = int(delta)+1
-            with sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/role/admin.db') as con:
+            with sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/role/admin.db') as con:
                 cur = con.cursor()
                 time_app = (cur.execute('SELECT time_app FROM login').fetchone())[0]
             date_obj = datetime.strptime(time_app, "%Y-%m-%d")
@@ -211,7 +211,7 @@ async def start(message: types.Message, state: FSMContext):
             sent_message = await message.answer (f'👋🏻 <i>Привет, {name}!!! 👋🏻\nРозыгрыш №{number} <b><u>активен</u></b>\nПроводиться в канале <a href="{giveaway_link}">{giveaway_name}</a> \nПосмотреть пост можно тут 👉🏻<a href="{link}">ЖМЯК</a>\nДо конца розыгрыша осталось <b><u>{delta1}</u></b> дней\n<b>WebApp будет активно еще <u>{delta_app}</u> дней</b>\nВыбирай нужный пункт</i>', parse_mode="HTML", disable_web_page_preview=True, reply_markup=board.as_markup())
             asyncio.create_task(delete_message_after_delay(sent_message.chat.id, sent_message.message_id))
         except:
-            with sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/role/admin.db') as con:
+            with sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/role/admin.db') as con:
                 cur = con.cursor()
                 time_app = (cur.execute('SELECT time_app FROM login').fetchone())[0]
             current_date = datetime.today()
@@ -223,13 +223,13 @@ async def start(message: types.Message, state: FSMContext):
     else:
         # Если не админ, проверяем наличие реги
         idtg = message.from_user.id
-        with sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
+        with sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
             cur = con.cursor()
             exist = cur.execute('SELECT 1 FROM tributes WHERE id_tg = ?', [idtg]).fetchone()
         
         # Если пользователь зарегистрирован, то проверяем розыгрыш на активность
         if exist:
-            with sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
+            with sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
                 act = 'active'
                 cur = con.cursor()
                 giveaway_act = cur.execute('SELECT 1 FROM giveaways_data WHERE giveaway_status = ?', [act]).fetchone()
@@ -237,7 +237,7 @@ async def start(message: types.Message, state: FSMContext):
             # Если розыгрыш завершен, проверяем на выигрыш
             if not giveaway_act:
                 try:
-                    with sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/giveaway/winners.db') as con:
+                    with sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/giveaway/winners.db') as con:
                         cur = con.cursor()
                         name = (cur.execute('SELECT us_name FROM winners WHERE id_tg = ?', [idtg]).fetchone())[0]
                         password = (cur.execute('SELECT password FROM winners WHERE id_tg = ?', [idtg]).fetchone())[0]
@@ -254,7 +254,7 @@ async def start(message: types.Message, state: FSMContext):
 
             # Если розыгрыш НЕ завершен, но пользователь зареган
             else:
-                with sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
+                with sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
                     cur = con.cursor()
                     giveaway_end = (cur.execute('SELECT giveaway_end FROM giveaways_data WHERE giveaway_status = ?', ['active']).fetchone())[0]
                 current_date = datetime.today()
@@ -267,7 +267,7 @@ async def start(message: types.Message, state: FSMContext):
 
         # Если реги нет 
         else:
-            with sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
+            with sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
                 act = 'active'
                 cur = con.cursor()
                 giveaway_act = cur.execute('SELECT 1 FROM giveaways_data WHERE giveaway_status = ?', [act]).fetchone()
@@ -291,7 +291,7 @@ async def start(message: types.Message, state: FSMContext):
             
             # Розыгрыш активен, регаем пользователя
             else:
-                with sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
+                with sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
                     act = 'active'
                     cur = con.cursor()
                     chan_id = (cur.execute('SELECT chan_id FROM giveaways_data WHERE giveaway_status = ?', [act]).fetchone())[0]
@@ -312,21 +312,21 @@ async def start(message: types.Message, state: FSMContext):
                             file_url = f"https://api.telegram.org/file/bot{TOKEN}/{file_info.file_path}"
                             response = requests.get(file_url)
                             # Сохраняем аватар в файл
-                            with open(f"home/userland/Jeanne_Aiogram/data/variables/scr/avatars/{idtg}.jpg", "wb") as avatar_file:
+                            with open(f"/home/userland/Jeanne_Aiogram/data/variables/scr/avatars/{idtg}.jpg", "wb") as avatar_file:
                                 avatar_file.write(response.content)
                            # Функция для преобразования изображения в бинарный формат
-                            with open(f"home/userland/Jeanne_Aiogram/data/variables/scr/avatars/{idtg}.jpg", "rb") as file:
+                            with open(f"/home/userland/Jeanne_Aiogram/data/variables/scr/avatars/{idtg}.jpg", "rb") as file:
                                 file.read()
                             # Преобразование изображения в бинарный формат
-                            image_path = f'home/userland/Jeanne_Aiogram/data/variables/scr/avatars/{idtg}.jpg'
+                            image_path = f'/home/userland/Jeanne_Aiogram/data/variables/scr/avatars/{idtg}.jpg'
                             ava = convert_image_to_binary(image_path)
                         else:
-                            with open("home/userland/Jeanne_Aiogram/data/variables/scr/no_ava.jpg", "rb") as file:
+                            with open("/home/userland/Jeanne_Aiogram/data/variables/scr/no_ava.jpg", "rb") as file:
                                 file.read()
-                            image_path = 'home/userland/Jeanne_Aiogram/data/variables/scr/no_ava.jpg'
+                            image_path = '/home/userland/Jeanne_Aiogram/data/variables/scr/no_ava.jpg'
                             ava = convert_image_to_binary(image_path)
 
-                        with sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
+                        with sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
                             cur = con.cursor()
                             cur.execute('INSERT INTO tributes (id_tg, us_nick, us_name, podpis, us_ava) VALUES (?, ?, ?, ?, ?)', (idtg, nick, name, podpiska, ava))
                         try:
@@ -335,7 +335,7 @@ async def start(message: types.Message, state: FSMContext):
                         except Exception as e:
                             print(f"Регистрация выполнена\nДо конца розыгрыша осталось: {e}")
                         
-                        with sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
+                        with sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
                             act = 'active'
                             cur = con.cursor()
                             chan_id = int((cur.execute('SELECT chan_id FROM giveaways_data WHERE giveaway_status = ?', [act]).fetchone())[0])
@@ -350,7 +350,7 @@ async def start(message: types.Message, state: FSMContext):
                     # Пользователь попытался зарегаться, но не подписан на канал
                     else:
                         try:
-                            with sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
+                            with sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
                                 act = 'active'
                                 cur = con.cursor()
                                 chan_link = (cur.execute('SELECT chan_link FROM giveaways_data WHERE giveaway_status = ?', [act]).fetchone())[0]
@@ -361,7 +361,7 @@ async def start(message: types.Message, state: FSMContext):
                             print(f"Вы не подписаны на канал 320: {e}")
                 except Exception as e:
                     print (f"322 строка :{e}")
-                    with sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
+                    with sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
                         act = 'active'
                         cur = con.cursor()
                         chan_link = (cur.execute('SELECT chan_link FROM giveaways_data WHERE giveaway_status = ?', [act]).fetchone())[0]
@@ -389,12 +389,12 @@ async def adminminus(callback_query: types.CallbackQuery):
     await callback_query.answer()
     admin_id = callback_query.data.split("_", 1)[1]
     try:
-        con = sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/role/admin.db')
+        con = sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/role/admin.db')
         cur = con.cursor()
         cur.execute("DELETE FROM admins WHERE idtg = ?", (admin_id,))
         con.commit()
         con.close()
-        con = sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/role/admin.db')
+        con = sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/role/admin.db')
         cur = con.cursor()
         all = cur.execute("SELECT id FROM admins ORDER BY id DESC LIMIT 1")
         all = int((cur.fetchone())[0])
@@ -444,7 +444,7 @@ async def winners(callback_query: types.CallbackQuery):
 async def notepad(callback_query: types.CallbackQuery):
     await callback_query.answer()
     i = callback_query.data.split("_", 1)[1]
-    con = sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/notepad/notepad.db')
+    con = sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/notepad/notepad.db')
     cur = con.cursor()
     nick = (cur.execute('SELECT admin_nick FROM note WHERE id = ?', [i]).fetchone())[0]
     link = (cur.execute('SELECT link FROM note WHERE id = ?', [i]).fetchone())[0]
@@ -452,7 +452,7 @@ async def notepad(callback_query: types.CallbackQuery):
     text_base = (cur.execute('SELECT text FROM note WHERE id = ?', [i]).fetchone())[0]
     con.close()
     board = InlineKeyboardBuilder()
-    con = sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/notepad/notepad.db')
+    con = sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/notepad/notepad.db')
     cur = con.cursor()
     try:
         all = cur.execute("SELECT id FROM note ORDER BY id DESC LIMIT 1")
@@ -480,12 +480,12 @@ async def notepad(callback_query: types.CallbackQuery):
 async def chan_minus (callback_query: types.CallbackQuery):
     await callback_query.answer()
     i = callback_query.data.split(":", 1)[1]
-    con = sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/giveaway/chan_data.db')
+    con = sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/giveaway/chan_data.db')
     cur = con.cursor()
     cur.execute("DELETE FROM channals WHERE id = ?", (i,))    
     con.commit()
     con.close()
-    con = sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/giveaway/chan_data.db')
+    con = sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/giveaway/chan_data.db')
     cur = con.cursor()
     cur.execute("SELECT * FROM channals")
     rows = cur.fetchall()
@@ -511,7 +511,7 @@ async def chan_minus (callback_query: types.CallbackQuery):
 @dp.callback_query(lambda c: c.data.startswith("start_giveaway:"))
 async def start_giveaway(callback_query: types.CallbackQuery, state: FSMContext):
     await callback_query.answer()
-    with sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
+    with sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
         cur = con.cursor()
         
         cur.execute('''
@@ -559,7 +559,7 @@ async def start_giveaway(callback_query: types.CallbackQuery, state: FSMContext)
         con.commit()
 
     i = callback_query.data.split(":", 1)[1]
-    con = sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/giveaway/chan_data.db')
+    con = sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/giveaway/chan_data.db')
     cur = con.cursor()
     text = (cur.execute("SELECT name FROM channals WHERE id_chan = ?", (i,)).fetchone())[0]
     link_chan = (cur.execute("SELECT link FROM channals WHERE id_chan = ?", (i,)).fetchone())[0]
@@ -623,7 +623,7 @@ async def process_callback(callback_query: types.CallbackQuery, state: FSMContex
         board.add(types.InlineKeyboardButton(text="❗️HELP❗️SOS❗️", callback_data="start_sos"))
         board.adjust(1)
         try:
-            with sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
+            with sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
                 cur = con.cursor()
                 number = int((cur.execute('SELECT COUNT (*) from giveaways_data').fetchone())[0])
                 giveaway_link = (cur.execute('SELECT chan_link FROM giveaways_data WHERE giveaway_status = ?', ['active']).fetchone())[0]
@@ -634,7 +634,7 @@ async def process_callback(callback_query: types.CallbackQuery, state: FSMContex
             current_date = datetime.today()
             date_obj = datetime.strptime(giveaway_end, "%d_%m_%Y")
             delta = (date_obj - current_date).days
-            with sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/role/admin.db') as con:
+            with sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/role/admin.db') as con:
                 cur = con.cursor()
                 time_app = (cur.execute('SELECT time_app FROM login').fetchone())[0]
             date_obj = datetime.strptime(time_app, "%Y-%m-%d")
@@ -642,7 +642,7 @@ async def process_callback(callback_query: types.CallbackQuery, state: FSMContex
             sent_message = await callback_query.message.edit_text (f'👋🏻 <i>Привет, {name}!!! 👋🏻\nРозыгрыш №{number} <b><u>активен</u></b>\nПроводиться в канале <a href="{giveaway_link}">{giveaway_name}</a> \nПосмотреть пост можно тут 👉🏻<a href="{link}">ЖМЯК</a>\nДо конца розыгрыша осталось <b><u>{delta}</u></b> дней\n<b>WebApp будет активно еще <u>{delta_app}</u> дней</b>\nВыбирай нужный пункт</i>', parse_mode="HTML", disable_web_page_preview=True, reply_markup=board.as_markup())
             asyncio.create_task(delete_message_after_delay(sent_message.chat.id, sent_message.message_id))
         except:
-            with sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/role/admin.db') as con:
+            with sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/role/admin.db') as con:
                 cur = con.cursor()
                 time_app = (cur.execute('SELECT time_app FROM login').fetchone())[0]
             current_date = datetime.today()
@@ -655,7 +655,7 @@ async def process_callback(callback_query: types.CallbackQuery, state: FSMContex
 
 
     elif data == "start_adminbase":
-        con = sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/role/admin.db')
+        con = sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/role/admin.db')
         cur = con.cursor()
         cur.execute("SELECT * FROM admins")
         rows = cur.fetchall()
@@ -685,7 +685,7 @@ async def process_callback(callback_query: types.CallbackQuery, state: FSMContex
         idtg = user_data['idtg']
         role = user_data['role']
         await state.clear()
-        con = sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/role/admin.db')
+        con = sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/role/admin.db')
         cur = con.cursor()
         cur.execute(f'INSERT INTO admins (idtg, role) VALUES ("{idtg}", "{role}")')
         con.commit()
@@ -702,7 +702,7 @@ async def process_callback(callback_query: types.CallbackQuery, state: FSMContex
         idtg = user_data['idtg']
         role = user_data['role']
         await state.clear()
-        con = sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/role/admin.db')
+        con = sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/role/admin.db')
         cur = con.cursor()
         cur.execute(f'INSERT INTO admins (idtg, role) VALUES ("{idtg}", "{role}")')
         con.commit()
@@ -714,7 +714,7 @@ async def process_callback(callback_query: types.CallbackQuery, state: FSMContex
 
 
     elif data == "start_adminbase_minus":
-        con = sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/role/admin.db')
+        con = sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/role/admin.db')
         cur = con.cursor()
         all = cur.execute("SELECT id FROM admins ORDER BY id DESC LIMIT 1")
         all = int((cur.fetchone())[0])
@@ -744,7 +744,7 @@ async def process_callback(callback_query: types.CallbackQuery, state: FSMContex
 
 
     elif data == "start_notepad":
-        con = sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/notepad/notepad.db')
+        con = sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/notepad/notepad.db')
         cur = con.cursor()
         board = InlineKeyboardBuilder()
         try:
@@ -781,7 +781,7 @@ async def process_callback(callback_query: types.CallbackQuery, state: FSMContex
 
     elif data == "note_minus":
         await state.set_state(ADMINS.minus)
-        con = sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/notepad/notepad.db')
+        con = sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/notepad/notepad.db')
         cur = con.cursor()
         cur.execute("SELECT * FROM note")
         rows = cur.fetchall()
@@ -797,7 +797,7 @@ async def process_callback(callback_query: types.CallbackQuery, state: FSMContex
 
     elif data == "giveaway":
         board = InlineKeyboardBuilder()
-        with sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
+        with sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
             cur = con.cursor()
             act = "active"
             try:
@@ -857,7 +857,7 @@ async def process_callback(callback_query: types.CallbackQuery, state: FSMContex
         manual_data = await state.get_data()
         idtg = manual_data['idtg']
         await state.clear()
-        with open(f'home/userland/Jeanne_Aiogram/data/variables/text/manual_send.txt', "r", encoding="utf-8") as file:
+        with open(f'/home/userland/Jeanne_Aiogram/data/variables/text/manual_send.txt', "r", encoding="utf-8") as file:
             text = file.read()
         try:
             await bot.send_message(chat_id = idtg, text = text, parse_mode="HTML", disable_web_page_preview=True)
@@ -875,17 +875,17 @@ async def process_callback(callback_query: types.CallbackQuery, state: FSMContex
     elif data == "giveaway_sos_look":
         try:
             text = "Зареганные пользователи:\n"
-            with open('home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway_tributes.txt', "w", encoding="utf-8") as file:
+            with open('/home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway_tributes.txt', "w", encoding="utf-8") as file:
                 file.write(text)
-            with sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
+            with sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
                 cur = con.cursor()
                 cur.execute("SELECT id, id_tg, us_nick, us_name FROM tributes")
                 rows = cur.fetchall()
             for row in rows:
-                with open('home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway_tributes.txt', "a", encoding="utf-8") as file:
+                with open('/home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway_tributes.txt', "a", encoding="utf-8") as file:
                     text = f'IDTG {row[1]}    NICK {row[2]}    NAME {row[3]}\n'
                     file.write(text)
-            with open('home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway_tributes.txt', "r", encoding="utf-8") as file:
+            with open('/home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway_tributes.txt', "r", encoding="utf-8") as file:
                 text = file.read()
             max_length: int = 4096
             lines = text.split("\n")  # Разделяем файл на строки
@@ -921,7 +921,7 @@ async def process_callback(callback_query: types.CallbackQuery, state: FSMContex
 
     elif data == "giveaway_start":
         try:
-            with sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
+            with sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
                 cur = con.cursor()
                 exist = (cur.execute('SELECT chan_link FROM giveaways_data WHERE giveaway_status = ?', ["active"]).fetchone())[0]
             board = InlineKeyboardBuilder()
@@ -930,7 +930,7 @@ async def process_callback(callback_query: types.CallbackQuery, state: FSMContex
             asyncio.create_task(delete_message_after_delay(sent_message.chat.id, sent_message.message_id))
         except:
             try:
-                with sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
+                with sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
                     cur = con.cursor()
                     cur.execute("DROP TABLE IF EXISTS loser")
                     cur.execute("DROP TABLE IF EXISTS tributes")
@@ -940,14 +940,14 @@ async def process_callback(callback_query: types.CallbackQuery, state: FSMContex
                 await callback_query.message.answer(f"<i>Не удалось удалить старую базу розыгрыша\nОшибка {e}</i>", parse_mode="HTML")
             try:
             # Удаление базы винеров
-                with sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/giveaway/winners.db') as con:
+                with sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/giveaway/winners.db') as con:
                     cur = con.cursor()
                     cur.execute("DROP TABLE IF EXISTS winners")
                     con.commit()
             except Exception as e:
                 await callback_query.message.answer(f"<i>Не удалось удалить старую базу винеров\nОшибка {e}</i>", parse_mode="HTML")
 
-            con = sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/giveaway/chan_data.db')
+            con = sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/giveaway/chan_data.db')
             cur = con.cursor()
             cur.execute("SELECT * FROM channals")
             rows = cur.fetchall()
@@ -980,7 +980,7 @@ async def process_callback(callback_query: types.CallbackQuery, state: FSMContex
 
 
     elif data == "giveaway_stop_choise":
-        with sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
+        with sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
             cur = con.cursor()
             act = "active"
             name_file = (cur.execute('SELECT giveaway_end FROM giveaways_data WHERE giveaway_status = ?', [act]).fetchone())[0]
@@ -994,19 +994,19 @@ async def process_callback(callback_query: types.CallbackQuery, state: FSMContex
 
 
     elif data == "giveaway_stop_go":
-        path = 'home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db'
+        path = '/home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db'
         reason_data = await state.get_data()
         reason = reason_data['stop_reason']
         name_file = reason_data['name_file']
         await state.clear()
         try:
-            with sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
+            with sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
                 cur = con.cursor()
                 cur.execute(f'UPDATE giveaways_data SET giveaway_status = ? WHERE giveaway_status = "active" ', ["finish"])
                 con.commit()
             board = InlineKeyboardBuilder()
             board.add(types.InlineKeyboardButton(text="↪️В начало↩️", callback_data="ok"))
-            with open(f'home/userland/Jeanne_Aiogram/data/history/log {name_file}.txt', "a", encoding="utf-8") as f:
+            with open(f'/home/userland/Jeanne_Aiogram/data/history/log {name_file}.txt', "a", encoding="utf-8") as f:
                 text = f'<b>Розыгрыш отменил</b> {nick}\n<b>Причина:</b> {reason}'
                 f = f.write(text)
             sent_message = await callback_query.message.edit_text("<i>Активный розыгрыш отменен\nинформация в историю добавлена</i>", parse_mode="HTML", reply_markup=board.as_markup())
@@ -1022,7 +1022,7 @@ async def process_callback(callback_query: types.CallbackQuery, state: FSMContex
         act = "active"
         stop_flag = 0
         result = "Нарандомил:\n"
-        with sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
+        with sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
             cur = con.cursor()
             cur.execute(f"DROP TABLE IF EXISTS winners")
             cur.execute(f"DROP TABLE IF EXISTS loser")
@@ -1094,7 +1094,7 @@ async def process_callback(callback_query: types.CallbackQuery, state: FSMContex
         act = "active"
         end = "finish"
         text = f"<b>Барабан крутил</b> {nick}\n<b>Победители :</b>\n"
-        with sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
+        with sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
             cur = con.cursor()
             win_date = (cur.execute('SELECT giveaway_end FROM giveaways_data WHERE giveaway_status = ?', [act]).fetchone())[0]
             cur.execute('SELECT id, id_tg, us_nick, us_name, password FROM winners')
@@ -1107,22 +1107,22 @@ async def process_callback(callback_query: types.CallbackQuery, state: FSMContex
                 text += "сообщение с паролем отправлено\n"
             except Exception as e:
                 text += f"сообщение с паролем не отправлено. Ошибка {e}\n"
-        with open (f'home/userland/Jeanne_Aiogram/data/history/log {win_date}.txt', "a", encoding="utf-8") as file:
+        with open (f'/home/userland/Jeanne_Aiogram/data/history/log {win_date}.txt', "a", encoding="utf-8") as file:
             file.write(text)
         try:
             loser_text = '<b>Лузера:</b>\n'
-            with sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
+            with sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
                 cur = con.cursor()
                 cur.execute("SELECT * FROM loser")
                 rows = cur.fetchall()
 
             for row in rows:
                 loser_text += f'{row[0]}) <b>Idtg</b> - {row[1]}, <b>name</b> - {row[2]}\n<b>Причина</b> - {row[3]}\n'
-            with open (f'home/userland/Jeanne_Aiogram/data/history/log {win_date}.txt', "a", encoding="utf-8") as file:
+            with open (f'/home/userland/Jeanne_Aiogram/data/history/log {win_date}.txt', "a", encoding="utf-8") as file:
                 file.write(loser_text)
         except Exception as e:
             await callback_query.message.answer(f"<i>Не удалось залогировать базу лузеров\nОшибка {e}</i>", parse_mode="HTML")
-        with sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
+        with sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
             cur = con.cursor()
             cur.execute("SELECT * FROM winners")
             rows = cur.fetchall()
@@ -1130,13 +1130,13 @@ async def process_callback(callback_query: types.CallbackQuery, state: FSMContex
         date = datetime.today()
         date = date.strftime("%d.%m.%Y")
 
-        with sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/giveaway/winners.db') as con:
+        with sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/giveaway/winners.db') as con:
             cur = con.cursor()
             cur.execute('CREATE TABLE IF NOT EXISTS winners(Id INTEGER PRIMARY KEY AUTOINCREMENT, id_tg VARCHAR (20), us_nick VARCHAR (40), us_name VARCHAR (40), password VARCHAR (20), us_ava BLOB, ava_path VARCHAR (200), giveaway_date VARCHAR (20))')
             for row in rows:
                 cur.execute('INSERT INTO winners (id_tg, us_nick, us_name, password, us_ava, giveaway_date) VALUES (?, ?, ?, ?, ?, ?)', (row[1], row[2], row[3], row[4], row[5], date))
             con.commit()
-        with sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
+        with sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
             cur = con.cursor()
             cur.execute(f'UPDATE giveaways_data SET admin_end = ? WHERE giveaway_status = "active" ', [nick])
             chan_id = int((cur.execute('SELECT chan_id FROM giveaways_data WHERE giveaway_status = ?', [act]).fetchone())[0])
@@ -1146,8 +1146,8 @@ async def process_callback(callback_query: types.CallbackQuery, state: FSMContex
         board.add(types.InlineKeyboardButton(text="↪️В начало↩️", callback_data="ok"))
         sent_message = await callback_query.message.answer(f"<i>Отправка сообщений завершена\nИстория розыгрыша записана\nРозыгрыш полностью завершен</i>", parse_mode="HTML", reply_markup=board.as_markup())
         asyncio.create_task(delete_message_after_delay(sent_message.chat.id, sent_message.message_id))
-        scr = FSInputFile("home/userland/Jeanne_Aiogram/data/variables/post/start_post.jpg")
-        with open('home/userland/Jeanne_Aiogram/data/variables/post/end_post.txt', "r", encoding="utf-8") as f:
+        scr = FSInputFile("/home/userland/Jeanne_Aiogram/data/variables/post/start_post.jpg")
+        with open('/home/userland/Jeanne_Aiogram/data/variables/post/end_post.txt', "r", encoding="utf-8") as f:
             caption = f.read()
         board = InlineKeyboardBuilder()
         board.add(types.InlineKeyboardButton(text="🎁Узнать результат🎁", url='https://t.me/namnambot_bot'))
@@ -1165,7 +1165,7 @@ async def process_callback(callback_query: types.CallbackQuery, state: FSMContex
 
 
     elif data == "channal_minus":
-        con = sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/giveaway/chan_data.db')
+        con = sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/giveaway/chan_data.db')
         cur = con.cursor()
         cur.execute("SELECT * FROM channals")
         rows = cur.fetchall()
@@ -1187,7 +1187,7 @@ async def process_callback(callback_query: types.CallbackQuery, state: FSMContex
 
     elif data == "post_ok":
          # Удаляем все содержимое папки avatars
-        TARGET_FOLDER = "home/userland/Jeanne_Aiogram/data/variables/scr/avatars"
+        TARGET_FOLDER = "/home/userland/Jeanne_Aiogram/data/variables/scr/avatars"
         items = os.listdir(TARGET_FOLDER)
         for item in items:
             item_path = os.path.join(TARGET_FOLDER, item)
@@ -1201,14 +1201,14 @@ async def process_callback(callback_query: types.CallbackQuery, state: FSMContex
         chan_name = giveaway_data['name']
         date_end = giveaway_data['date_end']
         await state.clear()
-        jpg_post = FSInputFile("home/userland/Jeanne_Aiogram/data/variables/post/start_post.jpg")
-        with open('home/userland/Jeanne_Aiogram/data/variables/post/start_post.txt', "r", encoding="utf-8") as f:
+        jpg_post = FSInputFile("/home/userland/Jeanne_Aiogram/data/variables/post/start_post.jpg")
+        with open('/home/userland/Jeanne_Aiogram/data/variables/post/start_post.txt', "r", encoding="utf-8") as f:
             text_post = f.read()
         board = InlineKeyboardBuilder()
         board.add(types.InlineKeyboardButton(text="Участвовать", url='https://t.me/namnambot_bot'))
         msg = await bot.send_photo(chat_id=chan_id, photo=jpg_post, caption=text_post, parse_mode="HTML", reply_markup=board.as_markup())
         msg_id = msg.message_id
-        with sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
+        with sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
             cur = con.cursor()
             cur.execute(f'INSERT INTO giveaways_data (admin_start, chan_name, chan_id, chan_link, msg_id, giveaway_status, giveaway_end) VALUES ("{admin_nick}", "{chan_name}", "{chan_id}", "{chan_link}", "{msg_id}", "active", "{date_end}")')
             con.commit()
@@ -1217,7 +1217,7 @@ async def process_callback(callback_query: types.CallbackQuery, state: FSMContex
         date_end = datetime.strptime(date_end, "%d_%m_%Y")
         name_file = date_end.strftime("%d_%m_%Y")
         date_end = date_end.strftime("%d.%m.%Y")
-        with open(f'home/userland/Jeanne_Aiogram/data/history/log {name_file}.txt', "w", encoding="utf-8") as f:
+        with open(f'/home/userland/Jeanne_Aiogram/data/history/log {name_file}.txt', "w", encoding="utf-8") as f:
             text = f'<b>Дата окончания розыгрыша</b> {date_end}\n<b>Розыгрыш создал</b> {admin_nick}\n'
             f = f.write(text)
         sent_message = await callback_query.message.edit_text(f"<i>Пост улетел, оформление закончено, можно отдыхать до {date_end}\nЖми кнопку</i>", parse_mode="HTML", reply_markup=board.as_markup())
@@ -1268,7 +1268,7 @@ async def manual_send_name(message: Message, state: FSMContext):
         name = manual_data['name']
         password = manual_data['password']
         board = InlineKeyboardBuilder()
-        with open(f'home/userland/Jeanne_Aiogram/data/variables/text/manual_send.txt', "w", encoding="utf-8") as file:
+        with open(f'/home/userland/Jeanne_Aiogram/data/variables/text/manual_send.txt', "w", encoding="utf-8") as file:
             text = f'<i>Приветствую, {name}!!! 👋🏻\nВы победили в розыгрыше от <b><a href="https://firestorm-servers.com/ru">Firestorm</a></b> 🥳\nПароль для получение выигрыша \n👉🏻 {password} 👈🏻\nСообщите его в личные сообщения дискорд <u>Aorid</u> либо <u>Retmex</u> и получите свой приз 🏆 !</i>'
             file.write(text)
         board.add(types.InlineKeyboardButton(text="✅Отправляем✅", callback_data="manual_send_go"))
@@ -1293,7 +1293,7 @@ async def much_win(message: Message, state: FSMContext):
         much_win = int(win_data['much_win'])
         act = 'active'
         if much_win > 0:
-            with sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
+            with sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/giveaway/giveaway.db') as con:
                 cur = con.cursor()
                 cur.execute(f'UPDATE giveaways_data SET giveaway_much_win = ? WHERE giveaway_status = "active" ', [much_win])
                 con.commit()
@@ -1340,16 +1340,16 @@ async def giveaway_post(message: Message, state: FSMContext):
         file_id = photo.file_id
         file = await bot.get_file(file_id)
         file_path = file.file_path
-        download_path = os.path.join('home/userland/Jeanne_Aiogram/data/variables/post', "start_post.jpg")
+        download_path = os.path.join('/home/userland/Jeanne_Aiogram/data/variables/post', "start_post.jpg")
         await bot.download_file(file_path, destination=download_path)
 
         description = message.html_text
-        description_path = os.path.join('home/userland/Jeanne_Aiogram/data/variables/post', "start_post.txt")
+        description_path = os.path.join('/home/userland/Jeanne_Aiogram/data/variables/post', "start_post.txt")
         with open(description_path, "w", encoding="utf-8") as f:
             f.write(description)
         with open(description_path, "r", encoding="utf-8") as f:
             text_post = f.read()
-        jpg_post = FSInputFile("home/userland/Jeanne_Aiogram/data/variables/post/start_post.jpg")
+        jpg_post = FSInputFile("/home/userland/Jeanne_Aiogram/data/variables/post/start_post.jpg")
 
         board = InlineKeyboardBuilder()
         board.add(types.InlineKeyboardButton(text="✅Отправить", callback_data="post_ok"))
@@ -1383,12 +1383,12 @@ async def link_chan(message: Message, state: FSMContext):
     id_chan = chan_data['id_chan']
     link = chan_data['link_chan']
     await state.clear()
-    con = sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/giveaway/chan_data.db')
+    con = sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/giveaway/chan_data.db')
     cur = con.cursor()
     cur.execute(f'INSERT INTO channals (id_chan, name, link) VALUES ("{id_chan}", "{name}", "{link}")')
     con.commit()
     con.close()
-    con = sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/giveaway/chan_data.db')
+    con = sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/giveaway/chan_data.db')
     cur = con.cursor()
     cur.execute("SELECT * FROM channals")
     rows = cur.fetchall()
@@ -1434,13 +1434,13 @@ async def note_link(message: Message, state: FSMContext):
     desc = note_data['desc']
     text = note_data['text']
     await state.clear()
-    con = sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/notepad/notepad.db')
+    con = sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/notepad/notepad.db')
     cur = con.cursor()
     cur.execute(f'INSERT INTO note (admin_nick, link, desc, text) VALUES ("{admin_nick}", "{link}", "{desc}", "{text}")')
     con.commit()
     cur.close()
     con.close()
-    con = sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/notepad/notepad.db')
+    con = sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/notepad/notepad.db')
     cur = con.cursor()
     all = cur.execute("SELECT id FROM note ORDER BY id DESC LIMIT 1")
     all = int((cur.fetchone())[0])
@@ -1469,12 +1469,12 @@ async def note_minus(message: Message, state: FSMContext):
     note_data = await state.get_data()
     number = note_data['note_minus']
     await state.clear()
-    con = sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/notepad/notepad.db')
+    con = sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/notepad/notepad.db')
     cur = con.cursor()
     cur.execute("DELETE FROM note WHERE id = ?", (number,))    
     con.commit()
     con.close()
-    con = sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/notepad/notepad.db')
+    con = sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/notepad/notepad.db')
     cur = con.cursor()
     all = cur.execute("SELECT id FROM note ORDER BY id DESC LIMIT 1")
     all = int((cur.fetchone())[0])
@@ -1503,10 +1503,10 @@ async def admin_plus(message: Message, state: FSMContext):
     await state.update_data(help=message.html_text)
     nick = message.from_user.username
     user_data = await state.get_data()
-    with open("home/userland/Jeanne_Aiogram/data/variables/text/SOS.txt", "w", encoding="utf-8") as file:
+    with open("/home/userland/Jeanne_Aiogram/data/variables/text/SOS.txt", "w", encoding="utf-8") as file:
         file.write(f"<b>Админ:</b> @{nick}\n")
         file.write(f"<b>Проблема:</b> {user_data['help']}\n")
-    with open("home/userland/Jeanne_Aiogram/data/variables/text/SOS.txt", "r", encoding="utf-8") as file:
+    with open("/home/userland/Jeanne_Aiogram/data/variables/text/SOS.txt", "r", encoding="utf-8") as file:
         text_sos = file.read()
         try:
             await bot.send_message(chat_id=master_id, text=text_sos, parse_mode="HTML")
@@ -1581,7 +1581,7 @@ async def list_directory(message: types.Message, path: str):
 
 # Проверка админ/юзер
 def is_user_admin(user_id: int):
-    con = sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/role/admin.db')
+    con = sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/role/admin.db')
     cur = con.cursor()
     cur.execute("SELECT * FROM admins WHERE idtg = ?", (user_id,))
     user = cur.fetchone()
@@ -1590,7 +1590,7 @@ def is_user_admin(user_id: int):
 
 # Проверка роли в БД
 def role_in_db(user_id: str):
-    with sqlite3.connect('home/userland/Jeanne_Aiogram/data/db/role/admin.db') as con:
+    with sqlite3.connect('/home/userland/Jeanne_Aiogram/data/db/role/admin.db') as con:
         cur = con.cursor()
         cur.execute('SELECT role FROM admins WHERE idtg = ?', [user_id])
         result = cur.fetchone()
