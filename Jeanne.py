@@ -42,13 +42,13 @@ from aiogram_calendar import SimpleCalendarCallback, SimpleCalendar
 
 from config import *
 
+from aiogram.client.session.aiohttp import AiohttpSession
+from aiohttp import ClientTimeout
 
+session = AiohttpSession(timeout=300)
 
-
-bot = Bot(token=TOKEN)
+bot = Bot(token=TOKEN, session=session)
 dp = Dispatcher()
-
-admin_db = '/home/userland/Jeanne_Aiogram/data/db/role/admin.db'
 
 
 HISTORY_DIR = "/home/userland/Jeanne_Aiogram/data/history"
@@ -960,7 +960,7 @@ async def process_callback(callback_query: types.CallbackQuery, state: FSMContex
                 board.add(types.InlineKeyboardButton(text="➖Удалить канал➖", callback_data="channal_minus"))
                 board.add(types.InlineKeyboardButton(text="↪️В начало↩️", callback_data="ok"))
                 board.adjust(*[1] * len(rows), 2, 1)
-                sent_message = await callback_query.message.edit_text(f"<i><b>WebApp будет активно еще <u>{exp}</u> дней</b>\nВыбирай канал для запуска розыгрыша</i>", parse_mode="HTML", reply_markup=board.as_markup())
+                sent_message = await callback_query.message.edit_text(f"<i>Выбирай канал для запуска розыгрыша</i>", parse_mode="HTML", reply_markup=board.as_markup())
                 asyncio.create_task(delete_message_after_delay(sent_message.chat.id, sent_message.message_id))
             except:
                 board.add(types.InlineKeyboardButton(text="➕Добавить канал➕", callback_data="channal_plus"))
